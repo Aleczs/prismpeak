@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .remove-btn {
+            padding: 5px 10px;
+            color: #fff;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Donation List</h1>
+        <form id="donationForm">
+            <label for="donorName">Donor Name:</label>
+            <input type="text" id="donorName" name="donorName" required>
+
+            <label for="donationAmount">Donation Amount:</label>
+            <input type="number" id="donationAmount" name="donationAmount" required>
+
+            <button type="submit">Add Donation</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Donator Name</th>
+                    <th>Donation Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="donationList">
+                <!-- Donation items will be appended here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load existing donations from localStorage
+            const donations = JSON.parse(localStorage.getItem('donations')) || [];
+            const donationList = document.getElementById('donationList');
+
+            function updateDonationList() {
+                donationList.innerHTML = '';
+                donations.forEach((donation, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${donation.name}</td>
+                        <td>${donation.amount}</td>
+                        <td><button class="remove-btn" data-index="${index}">Remove</button></td>
+                    `;
+                    donationList.appendChild(row);
+                });
+            }
+
+            updateDonationList();
+
+            document.getElementById('donationForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Get form values
+                const donorName = document.getElementById('donorName').value;
+                const donationAmount = document.getElementById('donationAmount').value;
+                
+                // Create new donation object
+                const newDonation = { name: donorName, amount: donationAmount };
+                
+                // Add to donations array
+                donations.push(newDonation);
+                
+                // Save to localStorage
+                localStorage.setItem('donations', JSON.stringify(donations));
+                
+                // Update donation list
+                updateDonationList();
+                
+                // Clear form fields
+                document.getElementById('donationForm').reset();
+            });
+
+            donationList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-btn')) {
+                    const index = event.target.getAttribute('data-index');
+                    donations.splice(index, 1);
+                    localStorage.setItem('donations', JSON.stringify(donations));
+                    updateDonationList();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
